@@ -1,0 +1,93 @@
+@{
+    ViewData["Title"] = "Request Discount";
+    Layout = "_Layout";
+    
+    var order = ViewBag.Order as POS.Models.Order;
+    var user = ViewBag.User as POS.Models.ApplicationUser;
+    var discountOptions = ViewBag.DiscountOptions as List<string>;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Special Discount Available</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        You are eligible for a 20% discount! Please select your discount type below.
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Order Summary</h5>
+                        <div class="d-flex justify-content-between">
+                            <span>Order #@order.Id</span>
+                            <span>@order.CreatedAt.ToString("MM/dd/yyyy h:mm tt")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <span>Product:</span>
+                            <span>@order.ProductName</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Quantity:</span>
+                            <span>@order.Quantity</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Regular Price:</span>
+                            <span>@order.TotalPrice.ToString("C")</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>With 20% Discount:</span>
+                            <span class="text-success fw-bold">@((order.TotalPrice * 0.8m).ToString("C"))</span>
+                        </div>
+                    </div>
+                    
+                    <h5>Discount Options</h5>
+                    <form method="post" action="@Url.Action("RequestDiscount", "Discount")">
+                        <input type="hidden" name="orderId" value="@order.Id" />
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label">Select Discount Type:</label>
+                            
+                            @if (discountOptions.Contains("SeniorCitizen"))
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="discountType" id="seniorCitizen" value="SeniorCitizen" checked>
+                                    <label class="form-check-label" for="seniorCitizen">
+                                        Senior Citizen Discount (20%)
+                                    </label>
+                                </div>
+                            }
+                            
+                            @if (discountOptions.Contains("PWD"))
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="discountType" id="pwd" value="PWD" @(discountOptions.Contains("SeniorCitizen") ? "" : "checked")>
+                                    <label class="form-check-label" for="pwd">
+                                        PWD Discount (20%)
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Important:</strong> The manager will need to verify your eligibility before the discount is applied. This may take a moment.
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="@Url.Action("CreatePayment", "Payment", new { orderId = order.Id })" class="btn btn-outline-secondary">
+                                Skip Discount
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                Request Discount
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
